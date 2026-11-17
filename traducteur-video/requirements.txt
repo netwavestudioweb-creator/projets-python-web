@@ -1,0 +1,8 @@
+# Traducteur de vidéo
+moviepy>=1.0
+SpeechRecognition>=3.8
+pydub>=0.25
+googletrans==4.0.0rc1
+#
+# ⚠️ Nécessite aussi l'outil système FFmpeg (non installable via pip) :
+#    https://ffmpeg.org/download.html

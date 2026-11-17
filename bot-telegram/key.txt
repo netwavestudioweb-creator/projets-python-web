@@ -1,0 +1,4 @@
+Le token du bot ne doit PAS être stocké ici en clair.
+Définissez-le dans la variable d'environnement TELEGRAM_BOT_TOKEN (voir README.md).
+
+⚠️ L'ancien token qui se trouvait dans ce fichier doit être révoqué via @BotFather.

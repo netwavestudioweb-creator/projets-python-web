@@ -1,0 +1,411 @@
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Convertisseur de Devises</title>
+    <style>
+        :root {
+            --primary-color: #4a90e2;
+            --secondary-color: #f5a623;
+            --background-color: #f0f4f8;
+            --text-color: #333;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            background-color: var(--background-color);
+            color: var(--text-color);
+            line-height: 1.6;
+            margin: 0;
+            padding: 0;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        header {
+            background-color: var(--primary-color);
+            color: white;
+            text-align: center;
+            padding: 20px 0;
+        }
+
+        h1 {
+            margin: 0;
+        }
+
+        .logo {
+            width: 50px;
+            height: 50px;
+            margin-right: 10px;
+        }
+
+        .converter-form {
+            background-color: white;
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            margin-top: 20px;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 5px;
+        }
+
+        input[type="number"],
+        select,
+        input[type="date"] {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 16px;
+        }
+
+        button {
+            background-color: var(--secondary-color);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            font-size: 16px;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        button:hover {
+            background-color: #e69100;
+        }
+
+        .result {
+            font-size: 24px;
+            font-weight: bold;
+            margin-top: 20px;
+            text-align: center;
+        }
+
+        .exchange-rate {
+            font-size: 14px;
+            color: #666;
+            text-align: center;
+            margin-top: 10px;
+        }
+
+        .current-rates {
+            margin-top: 40px;
+        }
+
+        .current-rates h2 {
+            color: var(--primary-color);
+        }
+
+        .rates-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+
+        .rate-item {
+            background-color: white;
+            border-radius: 4px;
+            padding: 10px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            flex: 1 1 calc(33.333% - 20px);
+        }
+
+        .last-update {
+            font-style: italic;
+            color: #666;
+            text-align: right;
+            margin-top: 10px;
+        }
+
+        .favorites {
+            margin-top: 40px;
+        }
+
+        .favorites h2 {
+            color: var(--primary-color);
+        }
+
+        .favorites-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .favorite-item {
+            background-color: var(--primary-color);
+            color: white;
+            padding: 5px 10px;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        .history {
+            margin-top: 40px;
+        }
+
+        .history h2 {
+            color: var(--primary-color);
+        }
+
+        .history-list {
+            list-style-type: none;
+            padding: 0;
+        }
+
+        .history-item {
+            background-color: white;
+            border-radius: 4px;
+            padding: 10px;
+            margin-bottom: 10px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        footer {
+            background-color: #333;
+            color: white;
+            text-align: center;
+            padding: 20px 0;
+            margin-top: 40px;
+        }
+
+        footer a {
+            color: var(--secondary-color);
+            text-decoration: none;
+        }
+
+        footer a:hover {
+            text-decoration: underline;
+        }
+
+        @media (max-width: 768px) {
+            .rate-item {
+                flex: 1 1 calc(50% - 20px);
+            }
+        }
+
+        @media (max-width: 480px) {
+            .rate-item {
+                flex: 1 1 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="container">
+            <h1>
+                <svg class="logo" width="50" height="50" viewBox="0 0 50 50" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <circle cx="25" cy="25" r="23" stroke="white" stroke-width="4"/>
+                    <path d="M25 10V40M17 18H33M17 32H33" stroke="white" stroke-width="4" stroke-linecap="round"/>
+                </svg>
+                Convertisseur de Devises
+            </h1>
+        </div>
+    </header>
+
+    <main class="container">
+        <form class="converter-form" id="converterForm">
+            <div class="form-group">
+                <label for="amount">Montant :</label>
+                <input type="number" id="amount" name="amount" min="0" step="0.01" required>
+            </div>
+            <div class="form-group">
+                <label for="fromCurrency">De :</label>
+                <select id="fromCurrency" name="fromCurrency" required>
+                    <option value="USD">USD - Dollar américain</option>
+                    <option value="EUR">EUR - Euro</option>
+                    <option value="GBP">GBP - Livre sterling</option>
+                    <option value="JPY">JPY - Yen japonais</option>
+                    <option value="CAD">CAD - Dollar canadien</option>
+                    <option value="AUD">AUD - Dollar australien</option>
+                    <option value="CNY">CNY - Yuan chinois</option>
+                    <option value="INR">INR - Roupie indienne</option>
+                    <option value="ZAR">ZAR - Rand sud-africain</option>
+                    <option value="NGN">NGN - Naira nigérian</option>
+                    <option value="XOF">XOF - Franc CFA</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="toCurrency">Vers :</label>
+                <select id="toCurrency" name="toCurrency" required>
+                    <option value="EUR">EUR - Euro</option>
+                    <option value="USD">USD - Dollar américain</option>
+                    <option value="GBP">GBP - Livre sterling</option>
+                    <option value="JPY">JPY - Yen japonais</option>
+                    <option value="CAD">CAD - Dollar canadien</option>
+                    <option value="AUD">AUD - Dollar australien</option>
+                    <option value="CNY">CNY - Yuan chinois</option>
+                    <option value="INR">INR - Roupie indienne</option>
+                    <option value="ZAR">ZAR - Rand sud-africain</option>
+                    <option value="NGN">NGN - Naira nigérian</option>
+                    <option value="XOF">XOF - Franc CFA</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="conversionDate">Date de conversion (optionnel) :</label>
+                <input type="date" id="conversionDate" name="conversionDate">
+            </div>
+            <button type="submit">Convertir</button>
+            <button type="button" id="invertCurrencies">Inverser les devises</button>
+        </form>
+
+        <div class="result" id="result"></div>
+        <div class="exchange-rate" id="exchangeRate"></div>
+
+        <section class="current-rates">
+            <h2>Taux de change actuels</h2>
+            <div class="rates-list" id="ratesList"></div>
+            <div class="last-update" id="lastUpdate"></div>
+        </section>
+
+        <section class="favorites">
+            <h2>Paires de devises favorites</h2>
+            <div class="favorites-list" id="favoritesList"></div>
+        </section>
+
+        <section class="history">
+            <h2>Historique des conversions</h2>
+            <ul class="history-list" id="historyList"></ul>
+        </section>
+    </main>
+
+    <footer>
+        <div class="container">
+            <p>&copy; 2024 Convertisseur de Devises. Tous droits réservés. | <a href="#">Mentions légales</a></p>
+        </div>
+    </footer>
+
+    <script>
+        // Taux de référence (repli hors-ligne). Remplacés par des taux en
+        // direct quand l'API est joignable.
+        const FALLBACK_RATES = {
+            "USD": 1, "EUR": 0.92, "GBP": 0.78, "JPY": 135.05, "CAD": 1.34,
+            "AUD": 1.49, "CNY": 7.14, "INR": 82.73, "ZAR": 18.20, "NGN": 770, "XOF": 602.5
+        };
+        let rates = { ...FALLBACK_RATES };
+
+        // Persistance favoris + historique
+        const FAV_KEY = "conv_favoris", HIST_KEY = "conv_historique";
+        function lire(cle) { try { return JSON.parse(localStorage.getItem(cle)) || []; } catch { return []; } }
+        function ecrire(cle, val) { try { localStorage.setItem(cle, JSON.stringify(val)); } catch (e) {} }
+        let favoris = lire(FAV_KEY);
+        let historique = lire(HIST_KEY);
+
+        const converterForm = document.getElementById('converterForm');
+        const resultDiv = document.getElementById('result');
+        const exchangeRateDiv = document.getElementById('exchangeRate');
+        const ratesListDiv = document.getElementById('ratesList');
+        const lastUpdateDiv = document.getElementById('lastUpdate');
+        const favoritesListDiv = document.getElementById('favoritesList');
+        const historyListDiv = document.getElementById('historyList');
+        const invertCurrenciesButton = document.getElementById('invertCurrencies');
+
+        function updateRatesList() {
+            ratesListDiv.innerHTML = '';
+            for (let currency in rates) {
+                const rateItem = document.createElement('div');
+                rateItem.className = 'rate-item';
+                rateItem.textContent = `${currency} : ${Number(rates[currency]).toFixed(2)}`;
+                ratesListDiv.appendChild(rateItem);
+            }
+        }
+
+        // Récupère les taux en direct (API gratuite, sans clé). Repli silencieux
+        // sur les taux de référence si le réseau est indisponible.
+        async function chargerTauxLive() {
+            lastUpdateDiv.textContent = 'Chargement des taux…';
+            try {
+                const rep = await fetch('https://open.er-api.com/v6/latest/USD');
+                const data = await rep.json();
+                if (data && data.rates) {
+                    Object.keys(rates).forEach(c => { if (data.rates[c]) rates[c] = data.rates[c]; });
+                    lastUpdateDiv.textContent = '🟢 Taux en direct — ' + new Date().toLocaleString();
+                } else { throw new Error('réponse invalide'); }
+            } catch (e) {
+                lastUpdateDiv.textContent = '🟠 Hors-ligne : taux de référence indicatifs — ' + new Date().toLocaleString();
+            }
+            updateRatesList();
+        }
+
+        function convertCurrency(amount, fromCurrency, toCurrency) {
+            return ((amount / rates[fromCurrency]) * rates[toCurrency]).toFixed(2);
+        }
+
+        function renderFavoris() {
+            favoritesListDiv.innerHTML = '';
+            favoris.forEach(pair => {
+                const [from, to] = pair.split('/');
+                const item = document.createElement('div');
+                item.className = 'favorite-item';
+                item.textContent = pair;
+                item.onclick = () => {
+                    document.getElementById('fromCurrency').value = from;
+                    document.getElementById('toCurrency').value = to;
+                };
+                favoritesListDiv.appendChild(item);
+            });
+        }
+
+        function addFavoritePair(from, to) {
+            const pair = `${from}/${to}`;
+            if (!favoris.includes(pair)) {          // plus de doublons
+                favoris.push(pair);
+                ecrire(FAV_KEY, favoris);
+                renderFavoris();
+            }
+        }
+
+        function renderHistorique() {
+            historyListDiv.innerHTML = '';
+            historique.forEach(txt => {
+                const li = document.createElement('li');
+                li.className = 'history-item';
+                li.textContent = txt;
+                historyListDiv.appendChild(li);
+            });
+        }
+
+        function addConversionToHistory(amount, from, to, result) {
+            historique.unshift(`${amount} ${from} = ${result} ${to} (${new Date().toLocaleString()})`);
+            historique = historique.slice(0, 10);   // garde les 10 dernières
+            ecrire(HIST_KEY, historique);
+            renderHistorique();
+        }
+
+        converterForm.addEventListener('submit', function(event) {
+            event.preventDefault();
+            const amount = parseFloat(document.getElementById('amount').value);
+            const fromCurrency = document.getElementById('fromCurrency').value;
+            const toCurrency = document.getElementById('toCurrency').value;
+            if (isNaN(amount) || amount < 0) { resultDiv.textContent = 'Entrez un montant valide.'; return; }
+            const result = convertCurrency(amount, fromCurrency, toCurrency);
+            resultDiv.textContent = `${amount} ${fromCurrency} = ${result} ${toCurrency}`;
+            exchangeRateDiv.textContent = `Taux : 1 ${fromCurrency} = ${(rates[toCurrency] / rates[fromCurrency]).toFixed(4)} ${toCurrency}`;
+            addConversionToHistory(amount, fromCurrency, toCurrency, result);
+            addFavoritePair(fromCurrency, toCurrency);
+        });
+
+        invertCurrenciesButton.addEventListener('click', function() {
+            const from = document.getElementById('fromCurrency').value;
+            document.getElementById('fromCurrency').value = document.getElementById('toCurrency').value;
+            document.getElementById('toCurrency').value = from;
+        });
+
+        // Initialisation
+        renderFavoris();
+        renderHistorique();
+        chargerTauxLive();
+    </script>
+</body>
+</html>

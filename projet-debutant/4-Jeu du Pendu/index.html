@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Jeu du Pendu</title>
+<style>
+    :root { --primary: #4a90e2; --secondary: #f5a623; --bg: #f0f4f8; --text: #333; --ok: #4CAF50; --ko: #e74c3c; }
+    * { box-sizing: border-box; }
+    body { font-family: Arial, sans-serif; background: var(--bg); color: var(--text); margin: 0; }
+    header { background: var(--primary); color: #fff; text-align: center; padding: 20px 0; }
+    header h1 { margin: 0; }
+    .container { max-width: 760px; margin: 0 auto; padding: 20px; text-align: center; }
+    svg#gallows { width: 220px; height: 240px; margin: 10px auto; display: block; }
+    svg#gallows .body-part { opacity: 0; transition: opacity .25s; }
+    svg#gallows .body-part.show { opacity: 1; }
+    #wordContainer { font-size: 32px; letter-spacing: 8px; margin: 16px 0; font-weight: bold; min-height: 40px; }
+    #info { color: #666; margin-bottom: 14px; }
+    #letterButtons { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; max-width: 560px; margin: 0 auto; }
+    #letterButtons button {
+        font-size: 17px; width: 42px; height: 42px; background: var(--secondary); color: #fff;
+        border: none; border-radius: 6px; cursor: pointer; transition: .15s;
+    }
+    #letterButtons button:hover:not(:disabled) { filter: brightness(1.08); }
+    #letterButtons button:disabled { cursor: not-allowed; opacity: .9; }
+    #letterButtons button.good { background: var(--ok); }
+    #letterButtons button.bad { background: var(--ko); }
+    #statusMessage { font-size: 22px; margin: 22px 0 10px; font-weight: bold; min-height: 28px; }
+    #score { color: #666; margin-bottom: 10px; }
+    #restartButton {
+        font-size: 17px; padding: 11px 22px; background: var(--primary); color: #fff;
+        border: none; border-radius: 6px; cursor: pointer;
+    }
+    footer { background: #333; color: #fff; text-align: center; padding: 18px 0; margin-top: 40px; }
+</style>
+</head>
+<body>
+<header><div class="container"><h1>🎯 Jeu du Pendu</h1></div></header>
+
+<main class="container">
+    <svg id="gallows" viewBox="0 0 200 220">
+        <!-- Potence -->
+        <line x1="20" y1="210" x2="120" y2="210" stroke="#333" stroke-width="5"/>
+        <line x1="50" y1="210" x2="50" y2="20" stroke="#333" stroke-width="5"/>
+        <line x1="50" y1="20" x2="130" y2="20" stroke="#333" stroke-width="5"/>
+        <line x1="130" y1="20" x2="130" y2="45" stroke="#333" stroke-width="5"/>
+        <!-- Corps (révélé progressivement) -->
+        <circle class="body-part" data-part="0" cx="130" cy="60" r="15" stroke="#333" stroke-width="4" fill="none"/>
+        <line class="body-part" data-part="1" x1="130" y1="75" x2="130" y2="130" stroke="#333" stroke-width="4"/>
+        <line class="body-part" data-part="2" x1="130" y1="90" x2="105" y2="115" stroke="#333" stroke-width="4"/>
+        <line class="body-part" data-part="3" x1="130" y1="90" x2="155" y2="115" stroke="#333" stroke-width="4"/>
+        <line class="body-part" data-part="4" x1="130" y1="130" x2="110" y2="165" stroke="#333" stroke-width="4"/>
+        <line class="body-part" data-part="5" x1="130" y1="130" x2="150" y2="165" stroke="#333" stroke-width="4"/>
+    </svg>
+
+    <div id="wordContainer"></div>
+    <div id="info"></div>
+    <div id="letterButtons"></div>
+    <div id="statusMessage"></div>
+    <div id="score"></div>
+    <button id="restartButton">Nouvelle partie</button>
+</main>
+
+<footer><div class="container"><p>Jeu du Pendu — un projet d'Adriano DODO</p></div></footer>
+
+<script>
+    const MOTS = [
+        "JAVASCRIPT", "PROGRAMMATION", "DEVELOPPEUR", "ORDINATEUR", "CLAVIER",
+        "INTERNET", "ALGORITHME", "VARIABLE", "FONCTION", "BENIN",
+        "COTONOU", "PYTHON", "SECURITE", "RESEAU", "FICHIER"
+    ];
+    const MAX_ERREURS = 6;
+
+    let motChoisi = "", lettresTrouvees = [], erreurs = 0, enCours = true;
+    let score = { gagnees: 0, perdues: 0 };
+
+    const wordContainer = document.getElementById("wordContainer");
+    const letterButtons = document.getElementById("letterButtons");
+    const statusMessage = document.getElementById("statusMessage");
+    const infoEl = document.getElementById("info");
+    const scoreEl = document.getElementById("score");
+    const boutons = {};
+
+    function initialiser() {
+        motChoisi = MOTS[Math.floor(Math.random() * MOTS.length)];
+        lettresTrouvees = [];
+        erreurs = 0;
+        enCours = true;
+        document.querySelectorAll(".body-part").forEach(p => p.classList.remove("show"));
+        statusMessage.textContent = "";
+        creerBoutons();
+        majMot();
+        majInfo();
+        majScore();
+    }
+
+    function majMot() {
+        wordContainer.textContent = motChoisi.split("")
+            .map(l => lettresTrouvees.includes(l) ? l : "_").join(" ");
+    }
+    function majInfo() { infoEl.textContent = `Erreurs : ${erreurs} / ${MAX_ERREURS}`; }
+    function majScore() { scoreEl.textContent = `✅ ${score.gagnees} gagnée(s) · ❌ ${score.perdues} perdue(s)`; }
+
+    function creerBoutons() {
+        letterButtons.innerHTML = "";
+        for (let i = 65; i <= 90; i++) {
+            const lettre = String.fromCharCode(i);
+            const b = document.createElement("button");
+            b.textContent = lettre;
+            b.onclick = () => deviner(lettre);
+            boutons[lettre] = b;
+            letterButtons.appendChild(b);
+        }
+    }
+
+    function deviner(lettre) {
+        if (!enCours || lettresTrouvees.includes(lettre) || boutons[lettre].disabled) return;
+        const b = boutons[lettre];
+        b.disabled = true;
+
+        if (motChoisi.includes(lettre)) {
+            lettresTrouvees.push(lettre);
+            b.classList.add("good");
+            majMot();
+            if (!wordContainer.textContent.includes("_")) terminer("gagne");
+        } else {
+            b.classList.add("bad");
+            erreurs++;
+            const part = document.querySelector(`.body-part[data-part="${erreurs - 1}"]`);
+            if (part) part.classList.add("show");
+            majInfo();
+            if (erreurs >= MAX_ERREURS) terminer("perdu");
+        }
+    }
+
+    function terminer(resultat) {
+        enCours = false;
+        if (resultat === "gagne") {
+            score.gagnees++;
+            statusMessage.textContent = "🎉 Bravo, vous avez gagné !";
+            statusMessage.style.color = "var(--ok)";
+        } else {
+            score.perdues++;
+            wordContainer.textContent = motChoisi.split("").join(" ");
+            statusMessage.textContent = `💀 Perdu ! Le mot était : ${motChoisi}`;
+            statusMessage.style.color = "var(--ko)";
+        }
+        majScore();
+    }
+
+    // Clavier physique
+    document.addEventListener("keydown", e => {
+        const l = e.key.toUpperCase();
+        if (l.length === 1 && l >= "A" && l <= "Z") deviner(l);
+    });
+
+    document.getElementById("restartButton").onclick = initialiser;
+    initialiser();
+</script>
+</body>
+</html>

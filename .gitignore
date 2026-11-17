@@ -1,0 +1,10 @@
+__pycache__/
+*.pyc
+*.pyo
+*.wav
+.passwd_hash
+contacts.json
+*.enc
+.venv/
+venv/
+node_modules/

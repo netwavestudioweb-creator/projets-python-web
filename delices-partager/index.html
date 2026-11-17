@@ -1,0 +1,411 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Au Goût Béninois — Partage de recettes</title>
+<style>
+    :root {
+        --teal: #50b3a2;
+        --teal-dark: #3d8a7d;
+        --orange: #e8491d;
+        --dark: #35424a;
+        --bg: #f4f4f4;
+        --card: #ffffff;
+        --text: #333;
+        --muted: #777;
+        --shadow: 0 6px 20px rgba(0,0,0,.08);
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        line-height: 1.6; color: var(--text); background: var(--bg);
+    }
+    .container { width: min(1100px, 92%); margin: auto; }
+    a { text-decoration: none; color: inherit; }
+
+    /* Header */
+    header {
+        background: var(--teal); color: #fff;
+        border-bottom: var(--orange) 3px solid; position: sticky; top: 0; z-index: 50;
+    }
+    header .container { display: flex; align-items: center; justify-content: space-between; padding: 16px 0; }
+    #branding h1 { font-size: 24px; }
+    #branding .highlight { color: var(--orange); }
+    nav ul { display: flex; gap: 22px; list-style: none; }
+    nav a { text-transform: uppercase; font-size: 14px; font-weight: 600; cursor: pointer; padding-bottom: 3px; border-bottom: 2px solid transparent; }
+    nav a:hover, nav a.active { border-bottom-color: var(--orange); }
+
+    /* Hero */
+    #showcase {
+        min-height: 420px; color: #fff; text-align: center; position: relative;
+        display: flex; align-items: center; justify-content: center;
+        background: linear-gradient(rgba(53,66,74,.55), rgba(53,66,74,.65)), url('./hero.webp') center/cover no-repeat;
+    }
+    #showcase h2 { font-size: clamp(28px, 5vw, 52px); margin-bottom: 12px; text-shadow: 0 2px 8px rgba(0,0,0,.4); }
+    #showcase p { font-size: clamp(15px, 2.5vw, 20px); max-width: 640px; margin: 0 auto 24px; }
+    .search-bar { display: flex; gap: 8px; justify-content: center; flex-wrap: wrap; }
+    .search-bar input {
+        padding: 12px 16px; border: 0; border-radius: 30px; width: min(380px, 80vw); font-size: 15px;
+    }
+
+    /* Sections */
+    section.block { padding: 48px 0; }
+    .section-title { text-align: center; font-size: 28px; margin-bottom: 6px; color: var(--dark); }
+    .section-sub { text-align: center; color: var(--muted); margin-bottom: 32px; }
+
+    /* Category chips */
+    .filters { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; margin-bottom: 30px; }
+    .chip {
+        padding: 8px 18px; border-radius: 30px; border: 2px solid var(--teal); background: #fff;
+        color: var(--teal-dark); font-weight: 600; cursor: pointer; transition: .15s; font-size: 14px;
+    }
+    .chip:hover { background: #eafaf6; }
+    .chip.active { background: var(--teal); color: #fff; }
+
+    /* Recipe grid */
+    .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 22px; }
+    .recipe {
+        background: var(--card); border-radius: 14px; overflow: hidden; box-shadow: var(--shadow);
+        cursor: pointer; transition: transform .15s, box-shadow .15s; display: flex; flex-direction: column;
+    }
+    .recipe:hover { transform: translateY(-4px); box-shadow: 0 12px 28px rgba(0,0,0,.14); }
+    .recipe .thumb { height: 120px; display: flex; align-items: center; justify-content: center; font-size: 54px; }
+    .recipe .body { padding: 16px; flex: 1; display: flex; flex-direction: column; }
+    .recipe .cat { font-size: 11px; text-transform: uppercase; letter-spacing: .5px; color: var(--orange); font-weight: 700; }
+    .recipe h3 { margin: 4px 0 8px; font-size: 19px; color: var(--dark); }
+    .recipe p { color: var(--muted); font-size: 14px; flex: 1; }
+    .recipe .meta { margin-top: 12px; font-size: 13px; color: var(--teal-dark); font-weight: 600; }
+    .empty { text-align: center; color: var(--muted); grid-column: 1/-1; padding: 40px; }
+
+    /* Modal */
+    .overlay {
+        position: fixed; inset: 0; background: rgba(0,0,0,.6); display: none;
+        align-items: center; justify-content: center; z-index: 100; padding: 16px;
+    }
+    .overlay.open { display: flex; }
+    .modal {
+        background: #fff; border-radius: 16px; max-width: 640px; width: 100%;
+        max-height: 88vh; overflow-y: auto; animation: pop .2s ease;
+    }
+    @keyframes pop { from { transform: scale(.94); opacity: 0; } }
+    .modal-head { padding: 26px 28px; background: var(--teal); color: #fff; position: relative; }
+    .modal-head .cat { color: #ffe; opacity: .9; font-size: 12px; text-transform: uppercase; }
+    .modal-head h2 { font-size: 26px; margin-top: 4px; }
+    .close { position: absolute; top: 16px; right: 20px; font-size: 28px; cursor: pointer; line-height: 1; }
+    .modal-body { padding: 24px 28px; }
+    .modal-body h4 { color: var(--orange); margin: 18px 0 8px; }
+    .modal-body ul, .modal-body ol { padding-left: 22px; }
+    .modal-body li { margin-bottom: 6px; }
+
+    /* Forms */
+    .form-card { background: #fff; border-radius: 14px; box-shadow: var(--shadow); padding: 28px; max-width: 620px; margin: auto; }
+    .form-card label { display: block; font-weight: 600; margin: 14px 0 6px; font-size: 14px; }
+    .form-card input, .form-card select, .form-card textarea {
+        width: 100%; padding: 11px 13px; border: 1px solid #ccc; border-radius: 8px; font-size: 14px; font-family: inherit;
+    }
+    .form-card textarea { resize: vertical; min-height: 80px; }
+    .btn {
+        margin-top: 20px; background: var(--orange); color: #fff; border: 0; padding: 13px 26px;
+        border-radius: 30px; font-size: 15px; font-weight: 700; cursor: pointer; transition: .15s;
+    }
+    .btn:hover { filter: brightness(1.08); }
+    .hint { font-size: 12px; color: var(--muted); }
+    .toast {
+        position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%) translateY(120%);
+        background: var(--dark); color: #fff; padding: 14px 24px; border-radius: 30px; transition: .3s; z-index: 200;
+    }
+    .toast.show { transform: translateX(-50%) translateY(0); }
+
+    /* Newsletter + footer */
+    #newsletter { background: var(--dark); color: #fff; padding: 32px 0; }
+    #newsletter .container { display: flex; align-items: center; justify-content: space-between; gap: 16px; flex-wrap: wrap; }
+    #newsletter form { display: flex; gap: 8px; flex-wrap: wrap; }
+    #newsletter input { padding: 11px 14px; border: 0; border-radius: 30px; width: 260px; }
+    footer { background: var(--orange); color: #fff; text-align: center; padding: 22px; }
+    footer .sig { font-weight: 700; }
+
+    .hidden { display: none !important; }
+    @media (max-width: 600px) {
+        header .container { flex-direction: column; gap: 10px; }
+        #newsletter .container { flex-direction: column; text-align: center; }
+    }
+</style>
+</head>
+<body>
+
+<header>
+    <div class="container">
+        <div id="branding"><h1>Au Goût <span class="highlight">Béninois</span></h1></div>
+        <nav>
+            <ul>
+                <li><a data-view="home" class="active">Accueil</a></li>
+                <li><a data-view="recipes">Recettes</a></li>
+                <li><a data-view="submit">Soumettre</a></li>
+            </ul>
+        </nav>
+    </div>
+</header>
+
+<!-- HOME -->
+<div id="view-home">
+    <section id="showcase">
+        <div class="container">
+            <h2>Partagez vos meilleures recettes</h2>
+            <p>Découvrez, cuisinez et partagez les saveurs du Bénin avec une communauté de passionnés.</p>
+            <div class="search-bar">
+                <input type="search" id="search" placeholder="Rechercher une recette (ex : Amiwo, haricot…)">
+            </div>
+        </div>
+    </section>
+
+    <section class="block">
+        <div class="container">
+            <h2 class="section-title">Explorez par catégorie</h2>
+            <p class="section-sub">Cliquez pour filtrer les recettes</p>
+            <div class="filters" id="filters"></div>
+            <div class="grid" id="grid"></div>
+        </div>
+    </section>
+</div>
+
+<!-- SUBMIT -->
+<div id="view-submit" class="hidden">
+    <section class="block">
+        <div class="container">
+            <h2 class="section-title">Soumettre une recette</h2>
+            <p class="section-sub">Ajoutez votre recette : elle apparaîtra aussitôt dans la liste.</p>
+            <form class="form-card" id="recipe-form">
+                <label>Nom de la recette *</label>
+                <input type="text" name="name" required placeholder="Ex : Riz au gras">
+                <label>Catégorie *</label>
+                <select name="category" required>
+                    <option value="Entrées">Entrées</option>
+                    <option value="Plats principaux" selected>Plats principaux</option>
+                    <option value="Desserts">Desserts</option>
+                </select>
+                <label>Courte description *</label>
+                <input type="text" name="desc" required placeholder="Une phrase qui donne envie">
+                <label>Ingrédients * <span class="hint">(un par ligne)</span></label>
+                <textarea name="ingredients" required placeholder="2 tasses de riz&#10;3 tomates&#10;…"></textarea>
+                <label>Étapes * <span class="hint">(une par ligne)</span></label>
+                <textarea name="steps" required placeholder="Laver le riz&#10;Faire revenir les tomates&#10;…"></textarea>
+                <label>Temps de préparation</label>
+                <input type="text" name="time" placeholder="Ex : 45 min">
+                <button type="submit" class="btn">Publier ma recette</button>
+            </form>
+        </div>
+    </section>
+</div>
+
+<section id="newsletter">
+    <div class="container">
+        <div><h2>Abonnez-vous à la newsletter</h2><p>Une nouvelle recette béninoise chaque semaine.</p></div>
+        <form id="newsletter-form">
+            <input type="email" required placeholder="Entrez votre email…">
+            <button type="submit" class="btn">S'abonner</button>
+        </form>
+    </div>
+</section>
+
+<footer>
+    <p>Au Goût Béninois — Copyright &copy; 2024</p>
+    <p class="sig">Un projet d'Adriano DODO</p>
+</footer>
+
+<!-- MODAL -->
+<div class="overlay" id="overlay">
+    <div class="modal">
+        <div class="modal-head">
+            <span class="close" id="close">&times;</span>
+            <span class="cat" id="m-cat"></span>
+            <h2 id="m-name"></h2>
+        </div>
+        <div class="modal-body">
+            <p id="m-desc"></p>
+            <p id="m-time" class="meta"></p>
+            <h4>Ingrédients</h4>
+            <ul id="m-ingredients"></ul>
+            <h4>Préparation</h4>
+            <ol id="m-steps"></ol>
+        </div>
+    </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// ---- Données : recettes béninoises de base ----
+const CATEGORIES = ["Toutes", "Entrées", "Plats principaux", "Desserts"];
+const EMOJI = { "Entrées": "🥗", "Plats principaux": "🍲", "Desserts": "🍰" };
+
+const RECETTES_BASE = [
+    {
+        name: "Amiwo", category: "Plats principaux",
+        desc: "Pâte de maïs rouge à la sauce tomate, un classique béninois, souvent servie avec du poulet.",
+        time: "1 h",
+        ingredients: ["2 tasses de farine de maïs", "4 tomates mûres", "2 oignons", "Pâte de tomate", "Piment", "Poulet", "Huile, sel, cube"],
+        steps: ["Préparer une sauce tomate avec oignons, piment et pâte de tomate", "Délayer la farine de maïs dans de l'eau froide", "Incorporer la farine à la sauce en remuant sans arrêt", "Cuire jusqu'à obtenir une pâte homogène", "Servir avec le poulet frit"]
+    },
+    {
+        name: "Atassi (riz au haricot)", category: "Plats principaux",
+        desc: "Mélange généreux de riz et de haricots (niébé), souvent accompagné d'une sauce tomate.",
+        time: "50 min",
+        ingredients: ["2 tasses de riz", "1 tasse de haricots niébé", "Oignon", "Huile rouge", "Sel"],
+        steps: ["Précuire les haricots jusqu'à mi-cuisson", "Ajouter le riz lavé et de l'eau", "Saler et cuire à feu doux", "Servir chaud avec une sauce tomate"]
+    },
+    {
+        name: "Wagasi grillé", category: "Plats principaux",
+        desc: "Fromage peul doré à la poêle, servi avec une sauce tomate relevée.",
+        time: "30 min",
+        ingredients: ["Wagasi (fromage peul)", "Tomates", "Oignon", "Piment", "Huile"],
+        steps: ["Couper le wagasi en tranches", "Dorer les tranches à la poêle", "Préparer une sauce tomate relevée", "Napper le wagasi de sauce et servir"]
+    },
+    {
+        name: "Ata (beignets de haricot)", category: "Entrées",
+        desc: "Beignets croustillants à base de pâte de haricot niébé, parfaits en entrée ou en snack.",
+        time: "40 min",
+        ingredients: ["Haricots niébé", "Oignon", "Piment", "Sel", "Huile pour friture"],
+        steps: ["Tremper puis décortiquer les haricots", "Mixer en pâte lisse avec oignon et piment", "Battre la pâte pour l'aérer", "Frire des cuillerées dans l'huile chaude", "Égoutter et servir chaud"]
+    },
+    {
+        name: "Dégué", category: "Desserts",
+        desc: "Dessert frais de petites billes de mil au yaourt sucré et vanillé.",
+        time: "20 min",
+        ingredients: ["Couscous de mil", "Yaourt nature", "Sucre", "Lait concentré", "Vanille"],
+        steps: ["Cuire le couscous de mil à la vapeur", "Laisser refroidir", "Mélanger yaourt, lait concentré, sucre et vanille", "Incorporer le mil et servir bien frais"]
+    },
+    {
+        name: "Klui-klui", category: "Desserts",
+        desc: "Croquants torsadés à base de pâte d'arachide, en-cas emblématique du Bénin.",
+        time: "45 min",
+        ingredients: ["Pâte d'arachide", "Sel", "Un peu d'eau", "Huile pour friture"],
+        steps: ["Travailler la pâte d'arachide avec un peu d'eau et de sel", "Façonner des anneaux ou torsades", "Frire jusqu'à obtenir une couleur dorée", "Laisser refroidir pour un maximum de croquant"]
+    }
+];
+
+// ---- Stockage local des recettes soumises ----
+const CLE = "augout_beninois_recettes";
+function chargerSoumises() {
+    try { return JSON.parse(localStorage.getItem(CLE)) || []; }
+    catch { return []; }
+}
+function sauverSoumises(liste) {
+    try { localStorage.setItem(CLE, JSON.stringify(liste)); } catch (e) {}
+}
+
+let recettes = [...RECETTES_BASE, ...chargerSoumises()];
+let filtreCategorie = "Toutes";
+let recherche = "";
+
+// ---- Rendu ----
+const grid = document.getElementById("grid");
+const filtersEl = document.getElementById("filters");
+
+function rendreFiltres() {
+    filtersEl.innerHTML = "";
+    CATEGORIES.forEach(cat => {
+        const b = document.createElement("button");
+        b.className = "chip" + (cat === filtreCategorie ? " active" : "");
+        b.textContent = cat;
+        b.onclick = () => { filtreCategorie = cat; rendreFiltres(); rendreGrille(); };
+        filtersEl.appendChild(b);
+    });
+}
+
+function rendreGrille() {
+    const q = recherche.trim().toLowerCase();
+    const liste = recettes.filter(r =>
+        (filtreCategorie === "Toutes" || r.category === filtreCategorie) &&
+        (q === "" || r.name.toLowerCase().includes(q) || r.desc.toLowerCase().includes(q))
+    );
+    grid.innerHTML = "";
+    if (liste.length === 0) {
+        grid.innerHTML = '<p class="empty">Aucune recette ne correspond. Essayez un autre mot ou soumettez la vôtre !</p>';
+        return;
+    }
+    liste.forEach(r => {
+        const card = document.createElement("div");
+        card.className = "recipe";
+        card.innerHTML = `
+            <div class="thumb" style="background:#eafaf6">${EMOJI[r.category] || "🍽️"}</div>
+            <div class="body">
+                <span class="cat">${r.category}</span>
+                <h3>${r.name}</h3>
+                <p>${r.desc}</p>
+                <span class="meta">${r.time ? "⏱ " + r.time + " · " : ""}Voir la recette →</span>
+            </div>`;
+        card.onclick = () => ouvrirModal(r);
+        grid.appendChild(card);
+    });
+}
+
+// ---- Modal ----
+const overlay = document.getElementById("overlay");
+function ouvrirModal(r) {
+    document.getElementById("m-cat").textContent = r.category;
+    document.getElementById("m-name").textContent = r.name;
+    document.getElementById("m-desc").textContent = r.desc;
+    document.getElementById("m-time").textContent = r.time ? "⏱ Temps : " + r.time : "";
+    document.getElementById("m-ingredients").innerHTML = r.ingredients.map(i => `<li>${i}</li>`).join("");
+    document.getElementById("m-steps").innerHTML = r.steps.map(s => `<li>${s}</li>`).join("");
+    overlay.classList.add("open");
+}
+document.getElementById("close").onclick = () => overlay.classList.remove("open");
+overlay.onclick = (e) => { if (e.target === overlay) overlay.classList.remove("open"); };
+
+// ---- Navigation entre vues ----
+function afficherVue(vue) {
+    document.getElementById("view-home").classList.toggle("hidden", vue !== "home" && vue !== "recipes");
+    document.getElementById("view-submit").classList.toggle("hidden", vue !== "submit");
+    document.querySelectorAll("nav a").forEach(a => a.classList.toggle("active", a.dataset.view === vue));
+    if (vue === "recipes") document.querySelector(".block").scrollIntoView({ behavior: "smooth" });
+    else window.scrollTo({ top: 0, behavior: "smooth" });
+}
+document.querySelectorAll("nav a").forEach(a => a.onclick = () => afficherVue(a.dataset.view));
+
+// ---- Recherche ----
+document.getElementById("search").addEventListener("input", (e) => {
+    recherche = e.target.value; rendreGrille();
+});
+
+// ---- Toast ----
+function toast(msg) {
+    const t = document.getElementById("toast");
+    t.textContent = msg; t.classList.add("show");
+    setTimeout(() => t.classList.remove("show"), 2600);
+}
+
+// ---- Formulaire de soumission ----
+document.getElementById("recipe-form").addEventListener("submit", (e) => {
+    e.preventDefault();
+    const f = e.target;
+    const nouvelle = {
+        name: f.name.value.trim(),
+        category: f.category.value,
+        desc: f.desc.value.trim(),
+        time: f.time.value.trim(),
+        ingredients: f.ingredients.value.split("\n").map(s => s.trim()).filter(Boolean),
+        steps: f.steps.value.split("\n").map(s => s.trim()).filter(Boolean)
+    };
+    const soumises = chargerSoumises();
+    soumises.push(nouvelle);
+    sauverSoumises(soumises);
+    recettes = [...RECETTES_BASE, ...soumises];
+    f.reset();
+    toast("🎉 Merci ! Votre recette est publiée.");
+    filtreCategorie = nouvelle.category; recherche = "";
+    rendreFiltres(); rendreGrille(); afficherVue("home");
+});
+
+// ---- Newsletter ----
+document.getElementById("newsletter-form").addEventListener("submit", (e) => {
+    e.preventDefault(); e.target.reset(); toast("✅ Inscription enregistrée. À bientôt !");
+});
+
+// ---- Init ----
+rendreFiltres();
+rendreGrille();
+</script>
+</body>
+</html>

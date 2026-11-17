@@ -1,0 +1,2 @@
+# DODDS APPLICATION — aucune dépendance externe.
+# Tkinter, hashlib et webbrowser sont inclus avec Python 3.8+.

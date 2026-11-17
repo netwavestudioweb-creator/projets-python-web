@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Démo d'authentification</title>
+<style>
+    :root { --primary:#4a90e2; --primary-d:#357abd; --bg:#eef2f7; --card:#fff; --text:#333; --muted:#777; --ok:#4CAF50; --ko:#e74c3c; }
+    * { box-sizing: border-box; }
+    body { font-family:'Segoe UI',Arial,sans-serif; background:var(--bg); color:var(--text); margin:0; min-height:100vh; display:flex; flex-direction:column; align-items:center; padding:24px; }
+    a.back { align-self:flex-start; color:var(--primary); text-decoration:none; font-size:14px; }
+    .note { background:#fff8e1; border-left:4px solid #f5a623; padding:12px 16px; border-radius:8px; max-width:420px; margin:16px 0; font-size:13px; color:#705500; }
+    .card { background:var(--card); border-radius:14px; box-shadow:0 8px 28px rgba(0,0,0,.1); width:100%; max-width:420px; padding:28px; }
+    .tabs { display:flex; margin-bottom:20px; border-radius:8px; overflow:hidden; border:1px solid #ddd; }
+    .tabs button { flex:1; padding:11px; border:0; background:#f3f3f3; cursor:pointer; font-weight:600; font-size:15px; }
+    .tabs button.active { background:var(--primary); color:#fff; }
+    label { display:block; font-weight:600; margin:14px 0 6px; font-size:14px; }
+    input { width:100%; padding:11px 12px; border:1px solid #ccc; border-radius:8px; font-size:15px; }
+    .pw-wrap { position:relative; }
+    .pw-wrap button.toggle { position:absolute; right:8px; top:7px; border:0; background:none; cursor:pointer; font-size:13px; color:var(--primary); }
+    .meter { height:6px; border-radius:4px; background:#eee; margin-top:8px; overflow:hidden; }
+    .meter > div { height:100%; width:0; transition:.2s; }
+    .btn { margin-top:20px; width:100%; padding:13px; background:var(--primary); color:#fff; border:0; border-radius:8px; font-size:15px; font-weight:700; cursor:pointer; }
+    .btn:hover { background:var(--primary-d); }
+    .msg { margin-top:14px; font-size:14px; min-height:20px; text-align:center; }
+    .msg.ok { color:var(--ok); } .msg.ko { color:var(--ko); }
+    .hint { font-size:12px; color:var(--muted); }
+    footer { margin-top:24px; color:var(--muted); font-size:13px; }
+</style>
+</head>
+<body>
+    <a class="back" href="index.html">← Accueil</a>
+
+    <div class="note">
+        🔒 <strong>Démo pédagogique.</strong> Une vraie authentification se fait <strong>côté serveur</strong> (HTTPS, hachage lent type bcrypt/argon2). Ici tout reste dans votre navigateur. On ne transmet <strong>jamais</strong> un mot de passe par email, et on ne stocke jamais de mot de passe en clair.
+    </div>
+
+    <div class="card">
+        <div class="tabs">
+            <button id="tab-login" class="active" onclick="basculer('login')">Connexion</button>
+            <button id="tab-signup" onclick="basculer('signup')">Inscription</button>
+        </div>
+
+        <!-- Connexion -->
+        <form id="form-login">
+            <label>Email</label>
+            <input type="email" id="login-email" required placeholder="vous@exemple.com">
+            <label>Mot de passe</label>
+            <div class="pw-wrap">
+                <input type="password" id="login-pw" required>
+                <button type="button" class="toggle" onclick="voir('login-pw', this)">voir</button>
+            </div>
+            <button type="submit" class="btn">Se connecter</button>
+            <p class="msg" id="msg-login"></p>
+        </form>
+
+        <!-- Inscription -->
+        <form id="form-signup" style="display:none">
+            <label>Email</label>
+            <input type="email" id="su-email" required placeholder="vous@exemple.com">
+            <label>Mot de passe <span class="hint">(8 caractères minimum)</span></label>
+            <div class="pw-wrap">
+                <input type="password" id="su-pw" required minlength="8">
+                <button type="button" class="toggle" onclick="voir('su-pw', this)">voir</button>
+            </div>
+            <div class="meter"><div id="meter-bar"></div></div>
+            <label>Confirmer le mot de passe</label>
+            <input type="password" id="su-pw2" required>
+            <button type="submit" class="btn">Créer mon compte</button>
+            <p class="msg" id="msg-signup"></p>
+        </form>
+    </div>
+
+    <footer>Démo de formulaires — un projet d'Adriano DODO</footer>
+
+<script>
+    const CLE = "demo_auth_comptes";
+    function lireComptes() { try { return JSON.parse(localStorage.getItem(CLE)) || {}; } catch { return {}; } }
+    function ecrireComptes(c) { try { localStorage.setItem(CLE, JSON.stringify(c)); } catch (e) {} }
+
+    // Hachage SHA-256 (démo). En production : hachage lent côté serveur (bcrypt/argon2) + sel.
+    async function hacher(texte) {
+        const data = new TextEncoder().encode(texte);
+        const buf = await crypto.subtle.digest("SHA-256", data);
+        return [...new Uint8Array(buf)].map(b => b.toString(16).padStart(2, "0")).join("");
+    }
+
+    function basculer(vue) {
+        const login = vue === "login";
+        document.getElementById("form-login").style.display = login ? "block" : "none";
+        document.getElementById("form-signup").style.display = login ? "none" : "block";
+        document.getElementById("tab-login").classList.toggle("active", login);
+        document.getElementById("tab-signup").classList.toggle("active", !login);
+    }
+
+    function voir(id, btn) {
+        const champ = document.getElementById(id);
+        const masque = champ.type === "password";
+        champ.type = masque ? "text" : "password";
+        btn.textContent = masque ? "cacher" : "voir";
+    }
+
+    function message(id, texte, ok) {
+        const el = document.getElementById(id);
+        el.textContent = texte; el.className = "msg " + (ok ? "ok" : "ko");
+    }
+
+    // Indicateur de force
+    document.getElementById("su-pw").addEventListener("input", function() {
+        const v = this.value;
+        let score = 0;
+        if (v.length >= 8) score++;
+        if (/[A-Z]/.test(v) && /[a-z]/.test(v)) score++;
+        if (/\d/.test(v)) score++;
+        if (/[^A-Za-z0-9]/.test(v)) score++;
+        const bar = document.getElementById("meter-bar");
+        const couleurs = ["#e74c3c", "#e67e22", "#f1c40f", "#4CAF50"];
+        bar.style.width = (score * 25) + "%";
+        bar.style.background = couleurs[Math.max(0, score - 1)];
+    });
+
+    // Inscription
+    document.getElementById("form-signup").addEventListener("submit", async function(e) {
+        e.preventDefault();
+        const email = document.getElementById("su-email").value.trim().toLowerCase();
+        const pw = document.getElementById("su-pw").value;
+        const pw2 = document.getElementById("su-pw2").value;
+        if (pw.length < 8) return message("msg-signup", "Mot de passe trop court (8 min).", false);
+        if (pw !== pw2) return message("msg-signup", "Les mots de passe ne correspondent pas.", false);
+        const comptes = lireComptes();
+        if (comptes[email]) return message("msg-signup", "Un compte existe déjà avec cet email.", false);
+        comptes[email] = { hash: await hacher(pw) };   // on stocke le hachage, jamais le mot de passe
+        ecrireComptes(comptes);
+        message("msg-signup", "✅ Compte créé ! Vous pouvez vous connecter.", true);
+        this.reset();
+        document.getElementById("meter-bar").style.width = "0";
+    });
+
+    // Connexion
+    document.getElementById("form-login").addEventListener("submit", async function(e) {
+        e.preventDefault();
+        const email = document.getElementById("login-email").value.trim().toLowerCase();
+        const pw = document.getElementById("login-pw").value;
+        const comptes = lireComptes();
+        if (!comptes[email]) return message("msg-login", "Aucun compte avec cet email.", false);
+        const ok = comptes[email].hash === await hacher(pw);
+        message("msg-login", ok ? "✅ Connexion réussie. Bienvenue !" : "Mot de passe incorrect.", ok);
+    });
+</script>
+</body>
+</html>

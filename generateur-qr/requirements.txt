@@ -1,0 +1,3 @@
+# Générateur de QR code
+qrcode[pil]>=7.4
+Flask>=3.0        # requis uniquement pour l'interface web (app.py)

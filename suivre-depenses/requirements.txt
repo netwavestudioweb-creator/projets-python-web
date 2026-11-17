@@ -1,0 +1,4 @@
+# Gestion des dépenses et épargne
+matplotlib>=3.5
+Pillow>=9.0        # optionnel : seulement pour afficher l'icône (icon.png)
+# tkinter est inclus avec Python (pas d'installation séparée).

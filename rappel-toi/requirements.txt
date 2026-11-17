@@ -1,0 +1,4 @@
+# RAPPEL-TOI
+twilio>=8.0
+PyAudio>=0.2.11    # optionnel : enregistrement micro (nécessite PortAudio)
+# tkinter est inclus avec Python.

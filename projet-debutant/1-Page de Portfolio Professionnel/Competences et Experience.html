@@ -1,0 +1,407 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Compétences & Expérience Professionnelle - Mon Portfolio</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;700&display=swap');
+
+    :root {
+      --primary-color: #3498db; /* Correction : ajout de la variable primary-color */
+      --secondary-color: #2c3e50;
+      --accent-color: #e74c3c;
+      --bg-color: #ecf0f1;
+      --text-color: #333;
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Roboto', sans-serif;
+      line-height: 1.6;
+      color: var(--text-color);
+      background-color: var(--bg-color);
+    }
+
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 2rem;
+    }
+    
+    /* Header styles */
+    header {
+      background-color: var(--secondary-color);
+      color: var(--text-color);
+      padding: 1rem 0;
+      position: fixed;
+      width: 100%;
+      top: 0;
+      z-index: 1000;
+      transition: background-color 0.3s ease;
+    }
+
+    .header-content {
+      max-width: 1200px;
+      margin: 0 auto;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 0 2rem;
+    }
+
+    .nav-logo {
+      display: flex;
+      align-items: center;
+      color: var(--bg-color);
+    }
+
+    .nav-logo span {
+      font-weight: 600;
+      color: var(--bg-color);
+      font-size: 1.2rem;
+    }
+
+    .nav-links {
+      list-style-type: none; /* Supprime les puces */
+      padding: 0;
+      margin: 0;
+      display: flex;
+      align-items: center;
+      display: none; /* Cache les liens par défaut sur petits écrans */
+    }
+
+    .nav-links a {
+      text-decoration: none;
+      color: var(--bg-color);
+      font-weight: 600;
+      margin-left: 1rem;
+    }
+
+    .nav-links a:hover {
+      color: var(--primary-color);
+    }
+
+    .menu-icon {
+      display: block;
+      cursor: pointer;
+      background-color: var(--primary-color);
+      border-radius: 5px;
+      padding: 0.5rem;
+      color: var(--text-color);
+      font-size: 1.2rem;
+      border: none;
+      z-index: 1001; /* Ensure menu icon is above the menu */
+    }
+
+    .menu-icon:hover {
+      background-color: #5753D9;
+    }
+
+    .menu-open .nav-links {
+      display: flex;
+      flex-direction: column;
+      position: absolute;
+      top: 100%;
+      left: 0;
+      width: 100%;
+      background-color: var(--text-color);
+      box-shadow: var(--shadow);
+      padding: 1rem;
+      z-index: 1000; /* Ensure menu is above other content */
+    }
+
+    .menu-open .nav-links a {
+      display: block;
+      margin: 0.5rem 0;
+      text-align: center;
+    }
+
+    @media (min-width: 768px) {
+      .menu-icon {
+        display: none;
+      }
+      .nav-links {
+        display: flex;
+        margin-left: 1rem;
+      }
+      .menu-open .nav-links {
+        position: static;
+        box-shadow: none;
+        padding: 0;
+        z-index: auto; /* Remove z-index for larger screens */
+      }
+    }
+
+    h1, h2, h3 {
+      margin-bottom: 1rem;
+    }
+
+    .intro {
+      text-align: center;
+      margin-bottom: 2rem;
+    }
+
+    .content {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 2rem;
+    }
+
+    .skills, .experience {
+      flex: 1;
+      min-width: 300px;
+    }
+
+    .skill-category {
+      margin-bottom: 1.5rem;
+    }
+
+    .skill-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 0.5rem;
+    }
+
+    .skill-name {
+      font-weight: bold;
+    }
+
+    .skill-level {
+      color: var(--secondary-color);
+    }
+
+    .soft-skill {
+      margin-bottom: 1rem;
+    }
+
+    .soft-skill h4 {
+      color: var(--secondary-color);
+    }
+
+    .certification {
+      margin-bottom: 0.5rem;
+    }
+
+    .job {
+      margin-bottom: 2rem;
+      padding-bottom: 1rem;
+      border-bottom: 1px solid #ddd;
+    }
+
+    .job-title {
+      color: var(--secondary-color);
+      font-weight: bold;
+    }
+
+    .job-company {
+      font-style: italic;
+    }
+
+    .job-date {
+      color: #777;
+    }
+
+    .cta {
+      text-align: center;
+      margin-top: 2rem;
+    }
+
+    .cta-button {
+      display: inline-block;
+      background-color: var(--accent-color);
+      color: white;
+      padding: 0.5rem 1rem;
+      text-decoration: none;
+      border-radius: 5px;
+      transition: background-color 0.3s ease;
+    }
+
+    .cta-button:hover {
+      background-color: #c0392b;
+    }
+
+    @media (max-width: 768px) {
+      .content {
+        flex-direction: column;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="header-content">
+      <div class="nav-logo">Adriano DODO</div>
+      <button class="menu-icon" onclick="toggleMenu()">☰</button>
+      <nav>
+        <ul class="nav-links">
+          <li><a href="#home">Accueil</a></li>
+          <li><a href="./Apropos de moi .html">À propos</a></li>
+          <li><a href="./Competences et Experience.html">C & E</a></li>
+          <li><a href="./Portfolio.html">Portfolio</a></li>
+          <li><a href="./contact.html">Contact</a></li>
+        </ul>
+      </nav>
+    </div>
+  </header>
+  <br>
+  <br>
+  <br>
+  <main class="container">
+    <h1>Compétences & Expérience Professionnelle</h1>
+    <div class="intro">
+      <p>Découvrez mes compétences techniques et non techniques, ainsi que mon parcours professionnel dans le domaine des réseaux informatiques, des télécommunications et du design graphique.</p>
+    </div>
+
+    <div class="content">
+      <section class="skills">
+        <h2>Compétences</h2>
+        
+        <div class="skill-category">
+          <h3>Compétences Techniques</h3>
+          <div class="skill-item">
+            <span class="skill-name">Réseaux et Protocoles</span>
+            <span class="skill-level">★★★★☆</span>
+          </div>
+          <div class="skill-item">
+            <span class="skill-name">Sécurité réseau</span>
+            <span class="skill-level">★★★★★</span>
+          </div>
+          <div class="skill-item">
+            <span class="skill-name">Administration Système</span>
+            <span class="skill-level">★★★★☆</span>
+          </div>
+          <div class="skill-item">
+            <span class="skill-name">Technologies de Virtualisation</span>
+            <span class="skill-level">★★★☆☆</span>
+          </div>
+          <div class="skill-item">
+            <span class="skill-name">Gestion de Bases de Données</span>
+            <span class="skill-level">★★★★☆</span>
+          </div>
+          <div class="skill-item">
+            <span class="skill-name">Outils de Surveillance et de Gestion</span>
+            <span class="skill-level">★★★★☆</span>
+          </div>
+          <div class="skill-item">
+            <span class="skill-name">Connaissances en Design Graphique</span>
+            <span class="skill-level">★★★★☆</span>
+          </div>
+        </div>
+
+        <div class="skill-category">
+          <h3>Compétences Non Techniques</h3>
+          <div class="soft-skill">
+            <h4>Communication</h4>
+            <p>
+                Clarté et Précision : Capacité à expliquer des concepts techniques de manière claire et compréhensible pour des publics non techniques.
+                <br>Écoute Active : Compétence pour comprendre les besoins et les préoccupations des clients et des collègues.
+            </p>
+          </div>
+          <div class="soft-skill">
+            <h4>Gestion de projet</h4>
+            <p>Expérience en gestion de projets réseau de bout en bout, utilisant des méthodologies Agile et traditionnelles pour livrer des solutions dans les délais et le budget.</p>
+          </div>
+          <div class="soft-skill">
+            <h4>Résolution de problèmes</h4>
+            <p>Approche analytique et créative pour résoudre des problèmes complexes de réseau et de sécurité, avec un historique prouvé de solutions innovantes.</p>
+          </div>
+          <div class="soft-skill">
+            <h4>Adaptabilité </h4>
+            <p>
+              Flexibilité : Capacité à s'adapter aux changements et à gérer des situations imprévues avec calme et efficacité.
+              <br>Apprentissage Continu : Volonté d'apprendre de nouvelles compétences et de se tenir à jour avec les évolutions du secteur.
+            </p>
+          </div>
+        </div>
+
+        <div class="skill-category">
+          <h3>Certifications et Formations</h3>
+          <div class="certification">
+            <p>Cisco Certified Network Professional (CCNP), Cisco, 2022</p>
+          </div>
+          <div class="certification">
+            <p>CompTIA Security+, CompTIA, 2021</p>
+          </div>
+          <div class="certification">
+            <p>Formation en Design UX/UI, Udacity, 2020</p>
+          </div>
+        </div>
+      </section>
+
+      <section class="experience">
+        <h2>Expérience Professionnelle</h2>
+
+        <div class="job">
+          <h3 class="job-title">Ingénieur Réseau Senior</h3>
+          <p class="job-company">TechCorp Solutions, Paris</p>
+          <p class="job-date">Janvier 2020 - Présent</p>
+          <p>Responsable de la conception et de l'implémentation de solutions réseau complexes pour des clients entreprises. Gestion d'une équipe de 5 ingénieurs.</p>
+          <ul>
+            <li>Mise en place d'une architecture SD-WAN pour un client, réduisant les coûts de connectivité de 30% et améliorant les performances applicatives de 40%.</li>
+            <li>Implémentation de solutions de sécurité réseau avancées, réduisant les incidents de sécurité de 50% pour les clients clés.</li>
+          </ul>
+        </div>
+
+        <div class="job">
+          <h3 class="job-title">Spécialiste en Télécommunications</h3>
+          <p class="job-company">GlobalComm, Lyon</p>
+          <p class="job-date">Mars 2017 - Décembre 2019</p>
+          <p>Participation au déploiement et à la maintenance de réseaux de télécommunications, avec un focus sur les technologies 4G et 5G.</p>
+          <ul>
+            <li>Optimisation de la couverture 4G dans une zone urbaine dense, augmentant la capacité réseau de 50% et améliorant la satisfaction client.</li>
+            <li>Contribution à la planification initiale du déploiement 5G, incluant l'analyse de site et la modélisation de couverture.</li>
+          </ul>
+        </div>
+
+        <div class="job">
+          <h3 class="job-title">Designer Graphique Freelance</h3>
+          <p class="job-company">Indépendant</p>
+          <p class="job-date">Septembre 2020 - Présent (Temps partiel)</p>
+          <p>Création d'identités visuelles, de supports marketing et d'interfaces utilisateur pour diverses startups tech.</p>
+          <ul>
+            <li>Refonte de l'identité visuelle d'une startup IoT, augmentant l'engagement sur les réseaux sociaux de 25%.</li>
+            <li>Conception d'interfaces utilisateur intuitives pour des applications mobiles, contribuant à une augmentation de 30% du taux de rétention des utilisateurs.</li>
+          </ul>
+        </div>
+      </section>
+    </div>
+
+    <div class="cta">
+      <a href="./contact.html" class="cta-button">Discutons de votre projet !</a>
+    </div>
+  </main>
+
+  <script>
+    function toggleMenu() {
+      document.querySelector('nav').classList.toggle('menu-open');
+    }
+    // Animation pour les barres de compétences
+    function animateSkills() {
+      const skillLevels = document.querySelectorAll('.skill-level');
+      skillLevels.forEach(level => {
+        const stars = level.textContent;
+        level.textContent = '';
+        let i = 0;
+        const interval = setInterval(() => {
+          if (i < stars.length) {
+            level.textContent += stars[i];
+            i++;
+          } else {
+            clearInterval(interval);
+          }
+        }, 200);
+      });
+    }
+
+    // Exécuter l'animation au chargement de la page
+    window.addEventListener('load', animateSkills);
+  </script>
+</body>
+</html>

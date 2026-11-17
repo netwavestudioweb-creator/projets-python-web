@@ -1,0 +1,493 @@
+<html><head><base href="./">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Portfolio - Adriano DODO</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;700&display=swap');
+
+    :root {
+      --primary-color: #2c3e50;
+      --secondary-color: #3498db;
+      --accent-color: #e74c3c;
+      --bg-color: #ecf0f1;
+      --text-color: #333;
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Roboto', sans-serif;
+      background-color: var(--bg-color);
+      color: var(--text-color);
+      line-height: 1.6;
+    }
+
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 2rem;
+    }
+
+    header {
+      background-color: var(--primary-color);
+      color: white;
+      padding: 1rem 0;
+      position: fixed;
+      width: 100%;
+      top: 0;
+      z-index: 1000;
+      transition: background-color 0.3s ease;
+    }
+
+    .header-content {
+      max-width: 1200px;
+      margin: 0 auto;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 0 2rem;
+    }
+
+    .nav-logo {
+      display: flex;
+      align-items: center;
+    }
+
+    .nav-logo span {
+      font-weight: 600;
+      color: var(--primary-color);
+      font-size: 1.2rem;
+    }
+
+    .nav-links {
+      list-style-type: none; /* Supprime les puces */
+      padding: 0;
+      margin: 0;
+      display: flex;
+      align-items: center;
+      display: none; /* Cache les liens par défaut sur petits écrans */
+    }
+
+    .nav-links a {
+      text-decoration: none;
+      color: var(--bg-color);
+      font-weight: 600;
+      margin-left: 1rem;
+    }
+
+    .nav-links a:hover {
+      color: var(--bg-color);
+    }
+
+    .menu-icon {
+      display: block;
+      cursor: pointer;
+      background-color: var(--primary-color);
+      border-radius: 5px;
+      padding: 0.5rem;
+      color: white;
+      font-size: 1.2rem;
+      border: none;
+      z-index: 1001; /* Ensure menu icon is above the menu */
+    }
+
+    .menu-icon:hover {
+      background-color: #5753D9;
+    }
+
+    .menu-open .nav-links {
+      display: flex;
+      flex-direction: column;
+      position: absolute;
+      top: 100%;
+      left: 0;
+      width: 100%;
+      background-color: var(--text-color);
+      box-shadow: var(--shadow);
+      padding: 1rem;
+      z-index: 1000; /* Ensure menu is above other content */
+    }
+
+    .menu-open .nav-links a {
+      display: block;
+      margin: 0.5rem 0;
+      text-align: center;
+    }
+
+    @media (min-width: 768px) {
+      .menu-icon {
+        display: none;
+      }
+      .nav-links {
+        display: flex;
+        margin-left: 1rem;
+      }
+      .menu-open .nav-links {
+        position: static;
+        box-shadow: none;
+        padding: 0;
+        z-index: auto; /* Remove z-index for larger screens */
+      }
+    }
+    
+
+    h1 {
+      font-size: 2.5rem;
+      margin-bottom: 1rem;
+      text-align: center;
+    }
+
+    .intro {
+      text-align: center;
+      margin-bottom: 2rem;
+    }
+
+    .projects-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 2rem;
+    }
+
+    .project-card {
+      background-color: white;
+      border-radius: 10px;
+      overflow: hidden;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      transition: transform 0.3s ease;
+    }
+
+    .project-card:hover {
+      transform: translateY(-5px);
+    }
+
+    .project-image {
+      width: 100%;
+      height: 200px;
+      object-fit: cover;
+    }
+
+    .project-info {
+      padding: 1rem;
+    }
+
+    .project-title {
+      font-size: 1.2rem;
+      font-weight: bold;
+      margin-bottom: 0.5rem;
+    }
+
+    .project-category {
+      font-size: 0.9rem;
+      color: var(--secondary-color);
+      margin-bottom: 0.5rem;
+    }
+
+    .project-description {
+      font-size: 0.9rem;
+      margin-bottom: 1rem;
+    }
+
+    .view-project {
+      display: inline-block;
+      background-color: var(--accent-color);
+      color: white;
+      padding: 0.5rem 1rem;
+      text-decoration: none;
+      border-radius: 5px;
+      transition: background-color 0.3s ease;
+    }
+
+    .view-project:hover {
+      background-color: #c0392b;
+    }
+
+    .filters {
+      display: flex;
+      justify-content: center;
+      margin-bottom: 2rem;
+    }
+
+    .filter-button {
+      background-color: var(--secondary-color);
+      color: white;
+      border: none;
+      padding: 0.5rem 1rem;
+      margin: 0 0.5rem;
+      border-radius: 5px;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+    }
+
+    .filter-button:hover,
+    .filter-button.active {
+      background-color: var(--primary-color);
+    }
+
+    .modal {
+      display: none;
+      position: fixed;
+      z-index: 1;
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      overflow: auto;
+      background-color: rgba(0,0,0,0.4);
+    }
+
+    .modal-content {
+      background-color: #fefefe;
+      margin: 15% auto;
+      padding: 20px;
+      border: 1px solid #888;
+      width: 80%;
+      max-width: 600px;
+      border-radius: 10px;
+    }
+
+    .close {
+      color: #aaa;
+      float: right;
+      font-size: 28px;
+      font-weight: bold;
+    }
+
+    .close:hover,
+    .close:focus {
+      color: black;
+      text-decoration: none;
+      cursor: pointer;
+    }
+
+    @media (max-width: 768px) {
+      .projects-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .filters {
+        flex-wrap: wrap;
+      }
+
+      .filter-button {
+        margin: 0.5rem;
+      }
+    }
+
+    /* Footer styles */
+    footer {
+      background-color: var(--primary-color);
+      color: white;
+      text-align: center;
+      padding: 2rem;
+    }
+
+    .social-links {
+      margin-top: 1rem;
+    }
+
+    .social-links a {
+      color: white;
+      font-size: 1.5rem;
+      margin: 0 0.5rem;
+      transition: color 0.3s ease;
+    }
+
+    .social-links a:hover {
+      color: var(--secondary-color);
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="header-content">
+      <div class="nav-logo">Adriano DODO</div>
+      <nav>
+        <ul class="nav-links">
+          <li><a href="./index.html">Accueil</a></li>
+          <li><a href="./Apropos de moi .html">À propos</a></li>
+          <li><a href="./Competences et Experience.html">C & E</a></li>
+          <li><a href="./Portfolio.html">Portfolio</a></li>
+          <li><a href="./contact.html">Contact</a></li>
+        </ul>
+        <button class="menu-icon" onclick="toggleMenu()">☰</button>
+      </nav>
+    </div>
+  </header>
+
+  <main class="container">
+    <div class="container">
+      <br>
+      <h1>Mon Portfolio</h1>
+      <div class="intro">
+        <p>Découvrez mes projets en réseaux informatiques, télécommunications et design graphique. Chaque projet représente un défi unique que j'ai relevé avec passion et créativité.</p>
+      </div>
+    </div>
+    <div class="filters">
+      <button class="filter-button active" data-filter="all">Tous</button>
+      <button class="filter-button" data-filter="reseaux">Réseaux</button>
+      <button class="filter-button" data-filter="telecom">Télécommunications</button>
+      <button class="filter-button" data-filter="graphisme">Design Graphique</button>
+    </div>
+
+    <div class="projects-grid">
+      <div class="project-card" data-category="reseaux">
+        <img src="https://source.unsplash.com/random/400x300/?network" alt="Projet de réseau" class="project-image" width="400" height="300">
+        <div class="project-info">
+          <h3 class="project-title">Optimisation de Réseau d'Entreprise</h3>
+          <p class="project-category">Réseaux</p>
+          <p class="project-description">Refonte complète du réseau d'une entreprise pour améliorer les performances et la sécurité.</p>
+          <a href="#" class="view-project" data-project="projet1">Voir le projet</a>
+        </div>
+      </div>
+
+      <div class="project-card" data-category="telecom">
+        <img src="https://source.unsplash.com/random/400x300/?telecommunication" alt="Projet de télécommunication" class="project-image" width="400" height="300">
+        <div class="project-info">
+          <h3 class="project-title">Déploiement 5G</h3>
+          <p class="project-category">Télécommunications</p>
+          <p class="project-description">Participation au déploiement de la technologie 5G dans une zone urbaine.</p>
+          <a href="#" class="view-project" data-project="projet2">Voir le projet</a>
+        </div>
+      </div>
+
+      <div class="project-card" data-category="graphisme">
+        <img src="https://source.unsplash.com/random/400x300/?design" alt="Projet de design graphique" class="project-image" width="400" height="300">
+        <div class="project-info">
+          <h3 class="project-title">Identité Visuelle Tech Startup</h3>
+          <p class="project-category">Design Graphique</p>
+          <p class="project-description">Création de l'identité visuelle complète pour une startup technologique innovante.</p>
+          <a href="#" class="view-project" data-project="projet3">Voir le projet</a>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <div id="projectModal" class="modal">
+    <div class="modal-content">
+      <span class="close">&times;</span>
+      <h2 id="modalTitle"></h2>
+      <p id="modalDescription"></p>
+      <h3>Défis rencontrés :</h3>
+      <p id="modalChallenges"></p>
+      <h3>Solutions apportées :</h3>
+      <p id="modalSolutions"></p>
+      <h3>Technologies utilisées :</h3>
+      <p id="modalTechnologies"></p>
+      <h3>Résultats obtenus :</h3>
+      <p id="modalResults"></p>
+      <a id="modalLink" href="#" target="_blank">Voir le projet en ligne</a>
+    </div>
+  </div>
+
+  <footer id="contact">
+    <p>Contactez via : </p>
+    <p>Email: dodooalberic6@gmail.com</p>
+    <p>Tel: +229 50 88 46 70 OU +229 40 36 46 77  </p>
+    <p>© 2024 Adriano DODO - Tous droits réservés.</p>
+    <div class="social-links">
+      <a href="#"><i class="fab fa-linkedin"></i></a>
+      <a href="#"><i class="fab fa-github"></i></a>
+      <a href="#"><i class="fab fa-twitter"></i></a>
+    </div>
+  </footer>
+
+  <script>
+    function toggleMenu() {
+      document.querySelector('nav').classList.toggle('menu-open');
+    }
+    // Filtrage des projets
+    const filterButtons = document.querySelectorAll('.filter-button');
+    const projectCards = document.querySelectorAll('.project-card');
+
+    filterButtons.forEach(button => {
+      button.addEventListener('click', () => {
+        const filter = button.getAttribute('data-filter');
+        
+        filterButtons.forEach(btn => btn.classList.remove('active'));
+        button.classList.add('active');
+
+        projectCards.forEach(card => {
+          if (filter === 'all' || card.getAttribute('data-category') === filter) {
+            card.style.display = 'block';
+          } else {
+            card.style.display = 'none';
+          }
+        });
+      });
+    });
+
+    // Modal pour les détails du projet
+    const modal = document.getElementById('projectModal');
+    const modalTitle = document.getElementById('modalTitle');
+    const modalDescription = document.getElementById('modalDescription');
+    const modalChallenges = document.getElementById('modalChallenges');
+    const modalSolutions = document.getElementById('modalSolutions');
+    const modalTechnologies = document.getElementById('modalTechnologies');
+    const modalResults = document.getElementById('modalResults');
+    const modalLink = document.getElementById('modalLink');
+    const closeModal = document.querySelector('.close');
+
+    const projectDetails = {
+      projet1: {
+        title: "Optimisation de Réseau d'Entreprise",
+        description: "Refonte complète du réseau d'une entreprise de taille moyenne pour améliorer les performances, la sécurité et la scalabilité.",
+        challenges: "Intégration de systèmes hérités, minimisation des temps d'arrêt, respect d'un budget serré.",
+        solutions: "Mise en place d'une architecture réseau en couches, virtualisation des serveurs, implémentation de solutions de sécurité avancées.",
+        technologies: "Cisco IOS, VMware, Palo Alto Networks, Wireshark",
+        results: "Augmentation de 40% des performances du réseau, réduction de 60% des incidents de sécurité, économies annuelles de 25% sur les coûts d'exploitation.",
+        link: "https://example.com/projet-reseau"
+      },
+      projet2: {
+        title: "Déploiement 5G",
+        description: "Participation à un projet pilote de déploiement de la technologie 5G dans une zone urbaine densément peuplée.",
+        challenges: "Interférences avec les réseaux existants, optimisation de la couverture, respect des normes de santé et de sécurité.",
+        solutions: "Utilisation de small cells, mise en place d'un réseau C-RAN (Cloud Radio Access Network), optimisation spectrale avancée.",
+        technologies: "Ericsson 5G RAN, Massive MIMO, Network Slicing, Edge Computing",
+        results: "Couverture 5G étendue sur 85% de la zone ciblée, vitesses moyennes de 1.2 Gbps, latence réduite à moins de 5ms.",
+        link: "https://example.com/projet-5g"
+      },
+      projet3: {
+        title: "Identité Visuelle Tech Startup",
+        description: "Création de l'identité visuelle complète pour une startup spécialisée dans l'intelligence artificielle et l'IoT.",
+        challenges: "Exprimer la complexité technologique de manière accessible, créer une identité distinctive dans un marché saturé.",
+        solutions: "Développement d'un langage visuel basé sur des formes géométriques abstraites, palette de couleurs futuriste, typographie personnalisée.",
+        technologies: "Adobe Creative Suite, Figma, Blender pour les éléments 3D",
+        results: "Augmentation de 150% de la reconnaissance de la marque, 30% d'amélioration du taux de conversion sur le site web, identité primée lors d'un concours de design.",
+        link: "https://example.com/projet-design"
+      }
+    };
+
+    document.querySelectorAll('.view-project').forEach(button => {
+      button.addEventListener('click', (e) => {
+        e.preventDefault();
+        const projectId = button.getAttribute('data-project');
+        const project = projectDetails[projectId];
+
+        modalTitle.textContent = project.title;
+        modalDescription.textContent = project.description;
+        modalChallenges.textContent = project.challenges;
+        modalSolutions.textContent = project.solutions;
+        modalTechnologies.textContent = project.technologies;
+        modalResults.textContent = project.results;
+        modalLink.href = project.link;
+
+        modal.style.display = 'block';
+      });
+    });
+
+    closeModal.addEventListener('click', () => {
+      modal.style.display = 'none';
+    });
+
+    window.addEventListener('click', (e) => {
+      if (e.target === modal) {
+        modal.style.display = 'none';
+      }
+    });
+  </script>
+</body>
+</html>

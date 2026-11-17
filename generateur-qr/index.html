@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Générateur de QR Code Personnalisé</title>
+    <style>
+        body {
+            font-family: 'Roboto', sans-serif;
+            background-color: #f0f2f5;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+        .container {
+            max-width: 800px;
+            width: 100%;
+            background-color: #fff;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+        h1 {
+            text-align: center;
+            color: #333;
+            margin-bottom: 10px;
+        }
+        .description {
+            text-align: center;
+            color: #666;
+            margin-bottom: 30px;
+        }
+        .section {
+            margin-bottom: 30px;
+        }
+        .section-title {
+            font-size: 18px;
+            font-weight: bold;
+            margin-bottom: 15px;
+            color: #444;
+        }
+        .checkbox-group {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 10px;
+        }
+        label {
+            display: flex;
+            align-items: center;
+            margin-bottom: 10px;
+            cursor: pointer;
+        }
+        input[type="checkbox"] {
+            margin-right: 10px;
+        }
+        input[type="text"], input[type="email"], input[type="tel"], textarea {
+            width: 100%;
+            padding: 10px;
+            margin: 5px 0 15px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            box-sizing: border-box;
+            transition: border-color 0.3s ease;
+        }
+        input[type="text"]:focus, input[type="email"]:focus, input[type="tel"]:focus, textarea:focus {
+            border-color: #4CAF50;
+            outline: none;
+        }
+        button {
+            display: block;
+            width: 100%;
+            padding: 12px;
+            background-color: #4CAF50;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background-color 0.3s ease;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+        .hidden {
+            display: none;
+        }
+        #qrCode {
+            text-align: center;
+            margin-top: 30px;
+        }
+        #qrCode img {
+            max-width: 100%;
+            height: auto;
+        }
+        .download-options, .share-options {
+            display: flex;
+            justify-content: center;
+            margin-top: 20px;
+            flex-wrap: wrap;
+        }
+        .download-btn, .share-btn {
+            margin: 5px;
+            padding: 10px 20px;
+            background-color: #3498db;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+        .download-btn:hover, .share-btn:hover {
+            background-color: #2980b9;
+        }
+        .color-picker {
+            display: flex;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+        .color-picker label {
+            margin-right: 10px;
+        }
+        #loadingSpinner {
+            display: none;
+            text-align: center;
+            margin-top: 20px;
+        }
+        .spinner {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #3498db;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Générateur de QR Code Personnalisé</h1>
+        <p class="description">Créez facilement un QR Code avec vos informations personnelles ou professionnelles. Sélectionnez les détails à inclure, personnalisez l'apparence, puis générez votre QR Code unique en un clic !</p>
+        
+        <form id="qrForm">
+            <div class="section">
+                <div class="section-title">Sélectionnez les informations à inclure :</div>
+                <div class="checkbox-group">
+                    <label><input type="checkbox" id="chkNom"> Nom</label>
+                    <label><input type="checkbox" id="chkTel"> Numéro de téléphone</label>
+                    <label><input type="checkbox" id="chkEmail"> Email</label>
+                    <label><input type="checkbox" id="chkAdresse"> Adresse physique</label>
+                    <label><input type="checkbox" id="chkFacebook"> Facebook</label>
+                    <label><input type="checkbox" id="chkLinkedIn"> LinkedIn</label>
+                    <label><input type="checkbox" id="chkInstagram"> Instagram</label>
+                    <label><input type="checkbox" id="chkTwitter"> Twitter</label>
+                    <label><input type="checkbox" id="chkTikTok"> TikTok</label>
+                    <label><input type="checkbox" id="chkYouTube"> YouTube</label>
+                    <label><input type="checkbox" id="chkSiteWeb"> Site Web Personnel</label>
+                    <label><input type="checkbox" id="chkEntreprise"> Entreprise</label>
+                    <label><input type="checkbox" id="chkPoste"> Poste</label>
+                    <label><input type="checkbox" id="chkSiteProf"> Site Web Professionnel</label>
+                    <label><input type="checkbox" id="chkWhatsApp"> WhatsApp</label>
+                    <label><input type="checkbox" id="chkTelegram"> Telegram</label>
+                    <label><input type="checkbox" id="chkCV"> Lien CV en ligne</label>
+                    <label><input type="checkbox" id="chkMessage"> Message personnalisé</label>
+                </div>
+            </div>
+
+            <div class="section">
+                <div class="section-title">Saisissez vos informations :</div>
+                <input type="text" id="nom" placeholder="Nom" class="hidden">
+                <input type="tel" id="telephone" placeholder="Numéro de téléphone" class="hidden">
+                <input type="email" id="email" placeholder="Email" class="hidden">
+                <input type="text" id="adresse" placeholder="Adresse physique" class="hidden">
+                <input type="text" id="facebook" placeholder="Lien Facebook" class="hidden">
+                <input type="text" id="linkedin" placeholder="Lien LinkedIn" class="hidden">
+                <input type="text" id="instagram" placeholder="Lien Instagram" class="hidden">
+                <input type="text" id="twitter" placeholder="Lien Twitter" class="hidden">
+                <input type="text" id="tiktok" placeholder="Lien TikTok" class="hidden">
+                <input type="text" id="youtube" placeholder="Lien YouTube" class="hidden">
+                <input type="text" id="siteweb" placeholder="Site Web Personnel" class="hidden">
+                <input type="text" id="entreprise" placeholder="Nom de l'entreprise" class="hidden">
+                <input type="text" id="poste" placeholder="Intitulé du poste" class="hidden">
+                <input type="text" id="siteprof" placeholder="Site Web Professionnel" class="hidden">
+                <input type="text" id="whatsapp" placeholder="Numéro WhatsApp" class="hidden">
+                <input type="text" id="telegram" placeholder="Identifiant Telegram" class="hidden">
+                <input type="text" id="cv" placeholder="Lien vers votre CV en ligne" class="hidden">
+                <textarea id="message" placeholder="Message personnalisé" class="hidden"></textarea>
+            </div>
+
+            <div class="section">
+                <div class="section-title">Personnalisez l'apparence :</div>
+                <div class="color-picker">
+                    <label for="qrColor">Couleur du QR Code :</label>
+                    <input type="color" id="qrColor" value="#000000">
+                </div>
+                <div class="color-picker">
+                    <label for="bgColor">Couleur de fond :</label>
+                    <input type="color" id="bgColor" value="#ffffff">
+                </div>
+            </div>
+
+            <button type="submit">Générer QR Code</button>
+        </form>
+        
+        <div id="loadingSpinner">
+            <div class="spinner"></div>
+            <p>Génération du QR Code en cours...</p>
+        </div>
+
+        <div id="qrCode" class="hidden">
+            <img id="qrImage" src="" alt="QR Code">
+            <div class="download-options">
+                <button class="download-btn" id="downloadPNG">Télécharger PNG</button>
+                <button class="download-btn" id="downloadSVG">Télécharger SVG</button>
+                <button class="download-btn" id="downloadPDF">Télécharger PDF</button>
+            </div>
+            <div class="share-options">
+                <button class="share-btn" id="shareEmail" aria-label="Partager par Email">Partager par Email</button>
+                <button class="share-btn" id="shareWhatsApp" aria-label="Partager sur WhatsApp">Partager sur WhatsApp</button>
+                <button class="share-btn" id="shareFacebook" aria-label="Partager sur Facebook">Partager sur Facebook</button>
+                <button class="share-btn" id="shareTwitter" aria-label="Partager sur Twitter">Partager sur Twitter</button>
+            </div>
+        </div>
+    </div>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdn.rawgit.com/davidshimjs/qrcodejs/gh-pages/qrcode.min.js"></script>
+    <script>
+        document.getElementById('qrForm').addEventListener('submit', function(event) {
+            event.preventDefault();
+
+            document.getElementById('loadingSpinner').style.display = 'block';
+
+            var qrData = '';
+            var checkboxes = document.querySelectorAll('.checkbox-group input[type="checkbox"]');
+            var fields = document.querySelectorAll('input[type="text"], input[type="email"], input[type="tel"], textarea');
+
+            checkboxes.forEach(function(checkbox) {
+                var id = checkbox.id;
+                var field = document.getElementById(id.replace('chk', '').toLowerCase());
+
+                if (checkbox.checked && field) {
+                    if (field.value.trim()) {
+                        qrData += `${field.placeholder}: ${field.value}\n`;
+                    }
+                }
+            });
+
+            if (qrData) {
+                var qrColor = document.getElementById('qrColor').value;
+                var bgColor = document.getElementById('bgColor').value;
+
+                var qr = new QRCode(document.getElementById('qrImage'), {
+                    text: qrData,
+                    width: 256,
+                    height: 256,
+                    colorDark : qrColor,
+                    colorLight : bgColor
+                });
+
+                setTimeout(function() {
+                    document.getElementById('loadingSpinner').style.display = 'none';
+                    document.getElementById('qrCode').classList.remove('hidden');
+                }, 1000);
+            }
+        });
+
+        document.getElementById('downloadPNG').addEventListener('click', function() {
+            var canvas = document.querySelector('#qrCode canvas');
+            var link = document.createElement('a');
+            link.href = canvas.toDataURL('image/png');
+            link.download = 'qr-code.png';
+            link.click();
+        });
+
+        document.getElementById('downloadSVG').addEventListener('click', function() {
+            var canvas = document.querySelector('#qrCode canvas');
+            var link = document.createElement('a');
+            link.href = canvas.toDataURL('image/svg+xml');
+            link.download = 'qr-code.svg';
+            link.click();
+        });
+
+        document.getElementById('downloadPDF').addEventListener('click', function() {
+            var canvas = document.querySelector('#qrCode canvas');
+            var imgData = canvas.toDataURL('image/png');
+            var pdf = new jsPDF();
+            pdf.addImage(imgData, 'PNG', 0, 0);
+            pdf.save('qr-code.pdf');
+        });
+
+        document.getElementById('shareEmail').addEventListener('click', function() {
+            var qrImage = document.getElementById('qrImage').src;
+            var mailtoLink = `mailto:?subject=Votre QR Code&body=<img src="${qrImage}" alt="QR Code">`;
+            window.location.href = mailtoLink;
+        });
+
+        document.getElementById('shareWhatsApp').addEventListener('click', function() {
+            var qrImage = document.getElementById('qrImage').src;
+            var text = encodeURIComponent(`Voici mon QR Code : ${qrImage}`);
+            var whatsappLink = `https://api.whatsapp.com/send?text=${text}`;
+            window.open(whatsappLink, '_blank');
+        });
+
+        document.getElementById('shareFacebook').addEventListener('click', function() {
+            var qrImage = document.getElementById('qrImage').src;
+            var text = encodeURIComponent(`Voici mon QR Code : ${qrImage}`);
+            var facebookLink = `https://www.facebook.com/sharer/sharer.php?u=${text}`;
+            window.open(facebookLink, '_blank');
+        });
+
+        document.getElementById('shareTwitter').addEventListener('click', function() {
+            var qrImage = document.getElementById('qrImage').src;
+            var text = encodeURIComponent(`Voici mon QR Code : ${qrImage}`);
+            var twitterLink = `https://twitter.com/intent/tweet?text=${text}`;
+            window.open(twitterLink, '_blank');
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,338 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Portfolio Adriano.D - Ingénieur en Informatique</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&family=Roboto+Mono&display=swap');
+
+    :root {
+      --primary-color: #2c3e50;
+      --secondary-color: #3498db;
+      --accent-color: #e74c3c;
+      --text-color: #333;
+      --bg-color: #ecf0f1;
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Poppins', sans-serif;
+      background-color: var(--bg-color);
+      color: var(--text-color);
+      line-height: 1.6;
+    }
+
+    /* Loader styles */
+    .loader-container {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: var(--primary-color);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      z-index: 9999;
+      transition: opacity 0.5s ease-out;
+    }
+
+    .loader {
+      width: 100px;
+      height: 100px;
+      border: 5px solid var(--bg-color);
+      border-top: 5px solid var(--secondary-color);
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+    }
+
+    .binary-text {
+      position: absolute;
+      font-family: 'Roboto Mono', monospace;
+      font-size: 14px;
+      color: var(--secondary-color);
+      text-align: center;
+      opacity: 0.7;
+    }
+
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+
+    /* Header styles */
+    header {
+      background-color: var(--primary-color);
+      color: white;
+      padding: 1rem 0;
+      position: fixed;
+      width: 100%;
+      top: 0;
+      z-index: 1000;
+      transition: background-color 0.3s ease;
+    }
+
+    .header-content {
+      max-width: 1200px;
+      margin: 0 auto;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 0 2rem;
+    }
+
+    .nav-logo {
+      display: flex;
+      align-items: center;
+    }
+
+    .nav-logo span {
+      font-weight: 600;
+      color: var(--primary-color);
+      font-size: 1.2rem;
+    }
+
+    .nav-links {
+      list-style-type: none; /* Supprime les puces */
+      padding: 0;
+      margin: 0;
+      display: flex;
+      align-items: center;
+      display: none; /* Cache les liens par défaut sur petits écrans */
+    }
+
+    .nav-links a {
+      text-decoration: none;
+      color: var(--bg-color);
+      font-weight: 600;
+      margin-left: 1rem;
+    }
+
+    .nav-links a:hover {
+      color: var(--bg-color);
+    }
+
+    .menu-icon {
+      display: block;
+      cursor: pointer;
+      background-color: var(--primary-color);
+      border-radius: 5px;
+      padding: 0.5rem;
+      color: white;
+      font-size: 1.2rem;
+      border: none;
+      z-index: 1001; /* Ensure menu icon is above the menu */
+    }
+
+    .menu-icon:hover {
+      background-color: #5753D9;
+    }
+
+    .menu-open .nav-links {
+      display: flex;
+      flex-direction: column;
+      position: absolute;
+      top: 100%;
+      left: 0;
+      width: 100%;
+      background-color: var(--text-color);
+      box-shadow: var(--shadow);
+      padding: 1rem;
+      z-index: 1000; /* Ensure menu is above other content */
+    }
+
+    .menu-open .nav-links a {
+      display: block;
+      margin: 0.5rem 0;
+      text-align: center;
+    }
+
+    @media (min-width: 768px) {
+      .menu-icon {
+        display: none;
+      }
+      .nav-links {
+        display: flex;
+        margin-left: 1rem;
+      }
+      .menu-open .nav-links {
+        position: static;
+        box-shadow: none;
+        padding: 0;
+        z-index: auto; /* Remove z-index for larger screens */
+      }
+    }
+
+    /* Hero section styles */
+    .hero {
+      height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: linear-gradient(rgba(44, 62, 80, 0.7), rgba(44, 62, 80, 0.7)), url('https://source.unsplash.com/random/1920x1080/?technology') no-repeat center center/cover;
+      color: white;
+      text-align: center;
+      padding: 0 2rem;
+    }
+
+    .hero-content {
+      max-width: 800px;
+    }
+
+    .hero h1 {
+      font-size: 3rem;
+      margin-bottom: 1rem;
+    }
+
+    .hero p {
+      font-size: 1.2rem;
+      margin-bottom: 2rem;
+    }
+
+    .cta-button {
+      display: inline-block;
+      background-color: var(--accent-color);
+      color: white;
+      padding: 0.8rem 2rem;
+      border-radius: 50px;
+      text-decoration: none;
+      transition: background-color 0.3s ease;
+    }
+
+    .cta-button:hover {
+      background-color: #c0392b;
+    }
+
+    /* About section styles */
+    .about {
+      padding: 5rem 2rem;
+      max-width: 800px;
+      margin: 0 auto;
+      text-align: center;
+    }
+
+    .about h2 {
+      font-size: 2.5rem;
+      margin-bottom: 2rem;
+      color: var(--primary-color);
+    }
+
+    /* Footer styles */
+    footer {
+      background-color: var(--primary-color);
+      color: white;
+      text-align: center;
+      padding: 2rem;
+    }
+
+    .social-links {
+      margin-top: 1rem;
+    }
+
+    .social-links a {
+      color: white;
+      font-size: 1.5rem;
+      margin: 0 0.5rem;
+      transition: color 0.3s ease;
+    }
+
+    .social-links a:hover {
+      color: var(--secondary-color);
+    }
+
+    /* Responsive design */
+    @media (max-width: 768px) {
+      .header-content {
+        width: 100%;
+        padding: 0 1rem;
+        justify-content: space-between; /* Assure que le logo et le menu sont espacés */
+      }
+
+      .hero h1 {
+        font-size: 2.5rem;
+      }
+
+      .hero p {
+        font-size: 1rem;
+      }
+
+      .about {
+        padding: 3rem 1rem;
+      }
+
+     
+    }
+  </style>
+</head>
+<body>
+  <div class="loader-container" id="loader">
+    <div class="loader"></div>
+    <div class="binary-text" id="binaryText"></div>
+  </div>
+
+  <header>
+    <div class="header-content">
+      <div class="nav-logo">Adriano DODO</div>
+      <nav>
+        <ul class="nav-links">
+          <li><a href="#home">Accueil</a></li>
+          <li><a href="./Apropos de moi .html">À propos</a></li>
+          <li><a href="./Competences et Experience.html">C & E</a></li>
+          <li><a href="./Portfolio.html">Portfolio</a></li>
+          <li><a href="./contact.html">Contact</a></li>
+        </ul>
+        <button class="menu-icon" onclick="toggleMenu()">☰</button>
+      </nav>
+    </div>
+  </header>
+
+  <section id="home" class="hero">
+    <div class="hero-content">
+      <h1>Adriano DODO</h1>
+      <p>Ingénieur en Réseaux Informatiques et Télécommunications</p>
+    </div>
+  </section>
+
+  <section id="about" class="about">
+    <h2>À propos de moi</h2>
+    <p>Passionné par les réseaux informatiques et les télécommunications, je m'efforce de créer des solutions technologiques efficaces 
+      et sécurisées. Mon objectif est de concevoir et d'optimiser des infrastructures réseau robustes qui répondent aux besoins actuels 
+      tout en anticipant les défis futurs. Avec une attention particulière à la sécurité et à la performance, 
+      je suis déterminé à améliorer la connectivité et à faciliter la communication à l'échelle mondiale.</p>
+  </section>
+
+  <footer id="contact">
+    <p>Contactez via : </p>
+    <p>Email: dodooalberic6@gmail.com</p>
+    <p>Tel: +229 50 88 46 70 OU +229 40 36 46 77  </p>
+    <p>© 2024 Adriano DODO - Tous droits réservés.</p>
+    <div class="social-links">
+      <a href="#"><i class="fab fa-linkedin"></i></a>
+      <a href="#"><i class="fab fa-github"></i></a>
+      <a href="#"><i class="fab fa-twitter"></i></a>
+    </div>
+  </footer>
+
+  <script>
+    function toggleMenu() {
+      document.querySelector('nav').classList.toggle('menu-open');
+    }
+
+    document.addEventListener('DOMContentLoaded', function () {
+      var loader = document.getElementById('loader');
+      setTimeout(function () {
+        loader.style.opacity = '0';
+        setTimeout(function () {
+          loader.style.display = 'none';
+        }, 500);
+      }, 2000);
+    });
+  </script>
+</body>
+</html>
